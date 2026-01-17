@@ -71,7 +71,7 @@ body {
   padding: 0 24px;
 }
 
-/* ===== COLEGIADO ===== */
+/* ===== BLOCOS ===== */
 .folder {
   background: #fafafa;
   border: 1px solid #ddd;
@@ -84,19 +84,30 @@ body {
   background: var(--cecia-red);
   color: #fff;
   font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
 }
 
 .folder-content {
+  display: none;
   padding: 12px 20px 18px;
 }
 
 .file { padding: 6px 0; }
 
+.file a {
+  color: #0047ab;
+  text-decoration: none;
+}
+
+.file a:hover { text-decoration: underline; }
+
 /* ===== DATAS ===== */
 .datas {
   font-size: 15px;
   line-height: 1.6;
-  padding-bottom: 20px;
+  margin-bottom: 30px;
 }
 
 /* ===== FOOTER ===== */
@@ -133,6 +144,9 @@ body {
 <h3>Próximas Reuniões do Colegiado</h3>
 <div id="datas-reunioes" class="datas">Carregando próximas reuniões...</div>
 
+<h3>Documentos do Colegiado</h3>
+<div id="documentos-colegiado">Carregando documentos...</div>
+
 </div>
 
 <script>
@@ -162,7 +176,7 @@ async function carregarColegiado() {
   for (const g in grupos) {
     html += `<div class="folder">
       <div class="folder-header">${g}</div>
-      <div class="folder-content">`;
+      <div class="folder-content" style="display:block">`;
     grupos[g].forEach(n => html += `<div class="file">${n}</div>`);
     html += `</div></div>`;
   }
@@ -199,7 +213,6 @@ async function carregarProximasReunioes() {
     const valor = l.includes("\t") ? l.split("\t")[0] : l.split(",")[0];
     const dataStr = valor.replace(/"/g, "").trim();
     if (!dataStr) return;
-
     const data = parseDataBR(dataStr);
     if (data >= hoje) futuras.push(dataStr);
   });
@@ -212,6 +225,62 @@ async function carregarProximasReunioes() {
 }
 
 carregarProximasReunioes();
+</script>
+
+<script>
+/* ===== DOCUMENTOS DO COLEGIADO (GOOGLE DRIVE) ===== */
+const API_KEY = "AIzaSyACMK-L2y2-ZyJkwSkuu992Zug1dPFZgQM";
+const ROOT_FOLDER_COLEGIADO = "1tEdtPTi8nAqKXha1XDn_PgQpaIkBWOcS";
+
+async function driveApi(q) {
+  const url =
+    `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=files(id,name,mimeType)&supportsAllDrives=true&includeItemsFromAllDrives=true&key=${API_KEY}`;
+  const r = await fetch(url);
+  return (await r.json()).files || [];
+}
+
+async function carregarDocumentosColegiado() {
+  const container = document.getElementById("documentos-colegiado");
+  container.innerHTML = "";
+
+  const pastas = await driveApi(
+    `'${ROOT_FOLDER_COLEGIADO}' in parents and mimeType='application/vnd.google-apps.folder'`
+  );
+
+  for (const pasta of pastas) {
+    const box = document.createElement("div");
+    box.className = "folder";
+
+    const h = document.createElement("div");
+    h.className = "folder-header";
+    h.innerHTML = `📁 ${pasta.name} <span>▶</span>`;
+
+    const c = document.createElement("div");
+    c.className = "folder-content";
+
+    const arquivos = await driveApi(
+      `'${pasta.id}' in parents and mimeType!='application/vnd.google-apps.folder'`
+    );
+
+    arquivos.forEach(a => {
+      c.innerHTML += `<div class="file">
+        📄 <a target="_blank" href="https://drive.google.com/file/d/${a.id}/view">${a.name}</a>
+      </div>`;
+    });
+
+    h.onclick = () => {
+      const open = c.style.display === "block";
+      c.style.display = open ? "none" : "block";
+      h.querySelector("span").textContent = open ? "▶" : "▼";
+    };
+
+    box.appendChild(h);
+    box.appendChild(c);
+    container.appendChild(box);
+  }
+}
+
+carregarDocumentosColegiado();
 </script>
 
 <div class="footer">
