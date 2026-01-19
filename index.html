@@ -95,9 +95,7 @@ body {
   padding: 12px 20px 18px;
 }
 
-.file {
-  padding: 6px 0;
-}
+.file { padding: 6px 0; }
 
 /* ===== COLEGIADO ===== */
 .file.membro {
@@ -275,8 +273,30 @@ async function carregarDocumentosColegiado(){
 carregarDocumentosColegiado();
 </script>
 
+<!-- ================= DATA DE ATUALIZAÇÃO ================= -->
+<script>
+const DOC_DATA_ATUALIZACAO =
+  "https://docs.google.com/document/d/1ax3h5GVAqs0tDkE9hoVYXSpt3fEXwHYv/export?format=txt";
+
+async function carregarDataAtualizacao() {
+  try {
+    const res = await fetch(DOC_DATA_ATUALIZACAO);
+    let texto = (await res.text()).trim();
+    texto = texto.split(/\r?\n/).filter(l => l.trim()).join(" ");
+    document.getElementById("data-atualizacao").innerHTML =
+      "<strong>Última atualização:</strong> " + texto;
+  } catch {
+    document.getElementById("data-atualizacao").textContent =
+      "Última atualização: informação indisponível.";
+  }
+}
+
+carregarDataAtualizacao();
+</script>
+
 <div class="footer">
-Página institucional mantida pela Coordenação do Curso – CECIA / UFSJ.
+  Página institucional mantida pela Coordenação do Curso – CECIA / UFSJ.<br>
+  <span id="data-atualizacao">Carregando data da última atualização...</span>
 </div>
 
 </body>
