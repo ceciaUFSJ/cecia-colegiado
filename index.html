@@ -194,6 +194,43 @@ body {
   color: #666;
   margin: 60px 0 30px;
 }
+
+/* ===== PASTAS DO DRIVE ===== */
+.folder {
+  margin-bottom: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.folder-header {
+  background: #f7f7f7;
+  padding: 10px 14px;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s ease;
+}
+
+.folder-header:hover {
+  background: #ececec;
+}
+
+.folder-content {
+  display: none;         
+  padding: 10px 18px;
+  background: #fff;
+}
+
+.folder.open .folder-content {
+  display: block;        
+}
+
+.file {
+  margin: 6px 0;
+}
+
+
 </style>
 </head>
 
@@ -381,20 +418,52 @@ async function carregarDocumentosColegiado(){
     if(A===P) return -1; if(B===P) return 1; return A.localeCompare(B,"pt-BR");
   });
 
-  for(const p of pastas){
-    const aberta=p.name.toLowerCase()===PASTA_PRIORITARIA.toLowerCase();
-    const box=document.createElement("div"); box.className="folder";
-    const h=document.createElement("div"); h.className="folder-header";
-    h.innerHTML=`📁 ${p.name} <span>${aberta?"▼":"▶"}</span>`;
-    const cont=document.createElement("div"); cont.className="folder-content";
-    cont.style.display=aberta?"block":"none";
-    const arqs=await driveApi(`'${p.id}' in parents and mimeType!='application/vnd.google-apps.folder'`);
-    arqs.forEach(a=>{
-      cont.innerHTML+=`<div class="file">📄 <a target="_blank" href="https://drive.google.com/file/d/${a.id}/view">${a.name}</a></div>`;
-    });
-    h.onclick=()=>{const o=cont.style.display==="block"; cont.style.display=o?"none":"block"; h.querySelector("span").textContent=o?"▶":"▼";}
-    box.appendChild(h); box.appendChild(cont); c.appendChild(box);
-  }
+ for (const p of pastas) {
+
+  const aberta =
+    p.name.toLowerCase() === PASTA_PRIORITARIA.toLowerCase();
+
+  const box = document.createElement("div");
+  box.className = "folder";
+  if (aberta) box.classList.add("open");
+
+  const h = document.createElement("div");
+  h.className = "folder-header";
+  h.innerHTML = `
+    📁 ${p.name}
+    <span class="arrow">${aberta ? "▼" : "▶"}</span>
+  `;
+
+  const cont = document.createElement("div");
+  cont.className = "folder-content";
+
+  const arqs = await driveApi(
+    `'${p.id}' in parents and mimeType!='application/vnd.google-apps.folder'`
+  );
+
+  arqs.forEach(a => {
+    cont.innerHTML += `
+      <div class="file">
+        📄 <a target="_blank"
+              href="https://drive.google.com/file/d/${a.id}/view">
+          ${a.name}
+        </a>
+      </div>`;
+  });
+
+  h.addEventListener("click", () => {
+    const abertaAgora = box.classList.toggle("open");
+    h.querySelector(".arrow").textContent = abertaAgora ? "▼" : "▶";
+  });
+
+  box.appendChild(h);
+  box.appendChild(cont);
+  c.appendChild(box);
+}
+
+
+
+
 }
 carregarDocumentosColegiado();
 </script>
