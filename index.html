@@ -511,7 +511,9 @@ carregarProximasReunioes();
 <script>
 const API_KEY = "AIzaSyACMK-L2y2-ZyJkwSkuu992Zug1dPFZgQM";
 const ROOT_FOLDER_COLEGIADO = "1tEdtPTi8nAqKXha1XDn_PgQpaIkBWOcS";
-const PASTA_PRIORITARIA = "Regimentos e Resoluções Importantes";
+const PASTA_PRIORITARIA = " ";
+
+  <!-- ================= Regimentos e Resoluções Importantes ================= -->
 
 async function driveApi(q){
   const u=`https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(q)}&fields=files(id,name,mimeType)&supportsAllDrives=true&includeItemsFromAllDrives=true&key=${API_KEY}`;
