@@ -147,6 +147,73 @@ body {
 }
 
 
+
+
+
+
+
+
+  /* ===== REUNIÕES EM DUAS COLUNAS (lado a lado) ===== */
+.reunioes-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  align-items: start;
+  margin-top: 10px;
+}
+
+@media (max-width: 768px){
+  .reunioes-grid{
+    grid-template-columns: 1fr;
+  }
+}
+
+.reunioes-box{
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  padding: 12px 14px;
+  background: #fff;
+}
+
+.reunioes-box .tag{
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 999px;
+  margin-bottom: 8px;
+}
+
+.reunioes-box .tag.futuras{
+  background: #e7f5ff;
+  color: #0b5ed7;
+  border: 1px solid #b6e0ff;
+}
+
+.reunioes-box .tag.passadas{
+  background: #f1f3f5;
+  color: #495057;
+  border: 1px solid #dee2e6;
+}
+
+.reunioes-box ul{
+  margin: 8px 0 0 18px;
+}
+
+.reunioes-box li{
+  margin: 4px 0;
+}
+
+.reunioes-box li.passada{
+  text-decoration: line-through;
+  color: #777;
+}
+
+
+
+
+  
+
   
 
 /* =========================================================
@@ -578,7 +645,6 @@ async function carregarReunioes(){
   for (const d of todas) {
     const dt = parseDataBR(d);
     if (isNaN(dt.getTime())) continue;
-
     if (dt >= hoje) futuras.push(d);
     else passadas.push(d);
   }
@@ -587,8 +653,8 @@ async function carregarReunioes(){
   passadas.sort((a,b)=>parseDataBR(b)-parseDataBR(a)); // mais recentes primeiro
 
   const html = `
-    <div class="reunioes-lista">
-      <div>
+    <div class="reunioes-grid">
+      <div class="reunioes-box">
         <span class="tag futuras">Próximas</span>
         ${futuras.length
           ? `<ul>${futuras.map(d=>`<li>${d}</li>`).join("")}</ul>`
@@ -596,7 +662,7 @@ async function carregarReunioes(){
         }
       </div>
 
-      <div style="margin-top:14px;">
+      <div class="reunioes-box">
         <span class="tag passadas">Passadas</span>
         ${passadas.length
           ? `<ul>${passadas.map(d=>`<li class="passada">${d}</li>`).join("")}</ul>`
@@ -611,7 +677,6 @@ async function carregarReunioes(){
 
 carregarReunioes();
 </script>
-
 
 
 
